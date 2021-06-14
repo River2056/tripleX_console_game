@@ -1,4 +1,4 @@
 .vscode/
-./app.exe
-./test.exe
-./test01.cpp
+app.exe
+test.exe
+test01.cpp
