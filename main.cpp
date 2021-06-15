@@ -3,7 +3,7 @@
 #include <sstream>
 #include <algorithm>
 
-void PrintIntroduction()
+void PrintIntroduction(int LevelDifficulty)
 {
     /*
                           _____                          
@@ -79,13 +79,13 @@ $$$$$$$$$$$$$$$$$bs.                           .d$$$$$$$$
     ;
     std::cout << art << std::endl;
     std::cout << "You are a secret agent hacking into a secure server room...\n";
-    std::cout << "beginning security level " << "1" << "...\n";
+    std::cout << "beginning security level " << LevelDifficulty << "...\n";
     std::cout << "You need to enter the correct codes to continue...\n\n";
 }
 
-void PlayGame()
+bool PlayGame(int LevelDifficulty)
 {
-    PrintIntroduction();
+    PrintIntroduction(LevelDifficulty);
     const int CodeA = 5;
     const int CodeB = 6;
     const int CodeC = 7;
@@ -107,15 +107,28 @@ void PlayGame()
     if(GuessSum == CodeSum && GuessProduct == CodeProduct)
     {
         std::cout << "You Win!\n";
+        return true;
     }
     else
     {
         std::cout << "Wrong Guess, You lose...\n";
+        return false;
     }
+    return NULL;
 }
 
 int main()
 {
-    PlayGame();
+    int LevelDifficulty = 1;
+    while(true)
+    {
+        bool bLevelComplete = PlayGame(LevelDifficulty);
+        std::cin.clear();
+        std::cin.ignore();
+        if(bLevelComplete)
+        {
+            LevelDifficulty++;
+        }
+    }
     return 0;
 }

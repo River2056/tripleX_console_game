@@ -84,37 +84,28 @@ $$$$$$$$$$$$$$$$$bs.                           .d$$$$$$$$
     std::cout << "You need to enter the correct codes to continue...\n\n";
 }
 
-std::string generateRandomNumber()
+int *generateRandomNumbers(int maxRange)
 {
     srand((unsigned) time(0));
-    std::string result;
-    const std::string numbers[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-    int length = sizeof(numbers) / sizeof(numbers[0]);
-    std::size_t found;
+    static int numbers[3];
     for(int i = 0; i < 3; i++)
     {
-        std::string r;
-        do 
+        int *find, r;
+        do
         {
-            // look for r in result,
-            // if not found, found == std::string::npos => append new number to result
-            // if found, found != std::string::npos => pick random number again
-            r = numbers[rand() % length];
-            std::cout << "r: " << r << std::endl;
-            found = result.find(r);
-            std::cout << "found: " << found << std::endl;
-        } while(found != std::string::npos);
-        result += r;
+            r = rand() % maxRange;
+            find = std::find(std::begin(numbers), std::end(numbers), r);
+        } while (find != std::end(numbers));
+        numbers[i] = r;
     }
-    std::sort(result.begin(), result.end());
-    return result;
+    return numbers;
 }
 
-std::string promptEnterCode(std::string code)
+int *promptEnterCode()
 {
-    getline(std::cin, code);
-    std::sort(code.begin(), code.end());
-    return code;
+    static int GuessNum[3];
+    std::cin >> GuessNum[0] >> GuessNum[1] >> GuessNum[2];
+    return GuessNum;
 }
 
 void tripleXMainGame(int maxLevel)
@@ -125,10 +116,13 @@ void tripleXMainGame(int maxLevel)
         PrintIntroduction(initLevel);
         initLevel++;
 
-        std::string number = generateRandomNumber();
-        const int CodeA = number[0] - '0';
-        const int CodeB = number[1] - '0';
-        const int CodeC = number[2] - '0';
+        int *number = generateRandomNumbers(initLevel * (5 + initLevel - 1));
+        const int CodeA = number[0];
+        const int CodeB = number[1];
+        const int CodeC = number[2];
+        std::cout << "CodeA: " << CodeA << std::endl;
+        std::cout << "CodeB: " << CodeB << std::endl;
+        std::cout << "CodeC: " << CodeC << std::endl;
 
         const int CodeSum = CodeA + CodeB + CodeC;
         const int CodeProduct = CodeA * CodeB * CodeC;
@@ -140,29 +134,37 @@ void tripleXMainGame(int maxLevel)
 
         std::cout << "what are the 3 number code?" << std::endl;
 
-        std::string code;
-        std::stringstream ans;
-        code = promptEnterCode(code);
-        std::cout << "code: " << code << std::endl;
+        int GuessA, GuessB, GuessC, GuessSum, GuessProduct;
+        // std::cin >> GuessA >> GuessB >> GuessC;
+        int *UserInput = promptEnterCode();
+        GuessA = UserInput[0];
+        GuessB = UserInput[1];
+        GuessC = UserInput[2];
+        std::cout << "A: " << GuessA << std::endl;
+        std::cout << "B: " << GuessB << std::endl;
+        std::cout << "C: " << GuessC << std::endl;
+        GuessSum = GuessA + GuessB + GuessC;
+        GuessProduct = GuessA * GuessB * GuessC;
 
-        ans << CodeC << CodeA << CodeB;
-        std::string sortedAns = ans.str();
-        std::sort(sortedAns.begin(), sortedAns.end());
-        std::cout << "sortedAns: " << sortedAns << std::endl;
         int tryTimes = 3;
-        while(sortedAns != code && tryTimes > 0)
+        while(GuessSum != CodeSum && GuessProduct != CodeProduct && tryTimes > 0)
         {
             tryTimes--;
             std::cout << "Wrong! guess again!" << std::endl;
             std::cout << "You have " << tryTimes << " times left..." << std::endl;
             std::cout << "enter your guess: " << std::endl;
-            code = promptEnterCode(code);
+            UserInput = promptEnterCode();
+            GuessA = UserInput[0];
+            GuessB = UserInput[1];
+            GuessC = UserInput[2];
+            GuessSum = GuessA + GuessB + GuessC;
+            GuessProduct = GuessA * GuessB * GuessC;
         }
         if(tryTimes <= 0)
         {
             std::cout << "You failed to break into the server room! Mission failed!" << std::endl;
         }
-        if(sortedAns == code && tryTimes > 0)
+        if(GuessSum == CodeSum && GuessProduct == CodeProduct && tryTimes > 0)
         {
             std::cout << "Congradulations! you got it right!" << std::endl;
         }
