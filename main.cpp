@@ -2,8 +2,9 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <ctime>
 
-void PrintIntroduction(int LevelDifficulty)
+void PrintIntroduction(int LevelDifficulty, bool PrintArtAndGreeting)
 {
     /*
                           _____                          
@@ -77,18 +78,25 @@ $$$$$$$$$$$$$$$$$bs.                           .d$$$$$$$$
     "                `*+-._             _.-+*'                \n"
     "                      `\"*-------*\"'\n"
     ;
-    std::cout << art << std::endl;
-    std::cout << "You are a secret agent hacking into a secure server room...\n";
-    std::cout << "beginning security level " << LevelDifficulty << "...\n";
-    std::cout << "You need to enter the correct codes to continue...\n\n";
+    if(PrintArtAndGreeting)
+    {
+        std::cout << art << std::endl;
+        std::cout << "You are a secret agent hacking into a secure server room...\n";
+        std::cout << "beginning security level " << LevelDifficulty << "...\n";
+        std::cout << "You need to enter the correct codes to continue...\n\n";
+    }
+    else
+    {
+        std::cout << "\nBeginning security level " << LevelDifficulty << "...\n";
+    }
 }
 
-bool PlayGame(int LevelDifficulty)
+bool PlayGame(int LevelDifficulty, bool PrintArtAndGreeting, int life)
 {
-    PrintIntroduction(LevelDifficulty);
-    const int CodeA = 5;
-    const int CodeB = 6;
-    const int CodeC = 7;
+    PrintIntroduction(LevelDifficulty, PrintArtAndGreeting);
+    const int CodeA = (rand() % LevelDifficulty) + LevelDifficulty;
+    const int CodeB = (rand() % LevelDifficulty) + LevelDifficulty;
+    const int CodeC = (rand() % LevelDifficulty) + LevelDifficulty;
 
     const int CodeSum = CodeA + CodeB + CodeC;
     const int CodeProduct = CodeA * CodeB * CodeC;
@@ -104,31 +112,50 @@ bool PlayGame(int LevelDifficulty)
     GuessSum = GuessA + GuessB + GuessC;
     GuessProduct = GuessA * GuessB * GuessC;
 
-    if(GuessSum == CodeSum && GuessProduct == CodeProduct)
+    if(GuessSum == CodeSum && GuessProduct == CodeProduct && life > 0)
     {
-        std::cout << "You Win!\n";
+        std::cout << "*** Hacking success! entering next level... ***\n";
         return true;
     }
     else
     {
-        std::cout << "Wrong Guess, You lose...\n";
+        std::cout << "*** Wrong Guess, try again(you have " << life - 1 << " more tries left) ***\n";
         return false;
     }
-    return NULL;
+    return false;
 }
 
 int main()
 {
+    srand((unsigned) time(NULL));
+    bool PrintArtAndGreeting = true;
     int LevelDifficulty = 1;
-    while(true)
+    const int MaxDifficulty = 7;
+    int life = 3;
+    while(LevelDifficulty <= MaxDifficulty)
     {
-        bool bLevelComplete = PlayGame(LevelDifficulty);
+        bool bLevelComplete = PlayGame(LevelDifficulty, PrintArtAndGreeting, life);
         std::cin.clear();
         std::cin.ignore();
         if(bLevelComplete)
         {
             LevelDifficulty++;
         }
+        else
+        {
+            life--;
+            if(life <= 0)
+            {
+                std::cout << life << " tries left, sercurity alert! you have been caught!\n";
+                break;
+            }
+        }
+        PrintArtAndGreeting = false;
+    }
+    if(life > 0)
+    {
+        std::cout << "*** Access Granted... You're in... ***" << std::endl;
+        std::cout << "*** Anti-Sercurity System disabled, Congratulations! ***" << std::endl;
     }
     return 0;
 }
